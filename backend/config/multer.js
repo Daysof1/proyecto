@@ -69,3 +69,65 @@ const storage = multer.diskStorage({
  * @param {Object} file - Archivo que se esta subiendo
  * @param {Function} cb - Callback que se llama con (error, acceptFile)
  */
+const fileFilter = (req, file, cb) => {
+    //Tiempos Mime permitidos para imagenes
+    const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+
+    //Verificar si el tipo de archivo esta en la lista permitida
+    if(allowedMimeTypes.includes(file.mimetype)) {
+        // cb(null, true) -> aceptar el archivo
+        cb(null, true);
+    } else {
+        //cb(error) -> rechazar el archivo
+        cb(new Error('Solo permite imagenes (JPEG, JPG, PNG, GIF)'), false);
+    }
+};
+
+/**
+ * Configurar multer con las opciones definidas
+ */
+
+const upload = multer({
+    storage: storage,
+    fileFilter: fileFilter,
+    limist: {
+        //Limite de tamaño del archino en bytes
+        //por defecto 5MB (5 * 1024) 5242800 bytes
+        fileSize: parseInt(process.env.MAX_FILE_SIZE) || 5242800
+    }
+});
+
+/**
+ * Funcion para eliminar el archivo del servidor
+ * Util cuando se actualiza o elimina el producto
+ * 
+ * @param {String} filename - nombre del archivo a eliminar
+ * @returns {Boolean} - true si se elimino, false si hubo un error 
+ */
+
+const deleteFile = (filename) => {
+    try {
+        //Construit la ruta completa del archivo
+        const filePath = path.join(uploadPath, filename);
+
+        //Verificar si  el archivo existe 
+        if (fs.existsSync(filePath)) {
+            //Eliminar el archivo
+            fs.unlinkSync(filePath);
+            console.log(`Archivo eliminado: ${filename}`);
+            return true;
+        } else {
+            console.log(`Archivo no escontrado: ${filename}`);
+            return false;
+        }
+    } catch (error) {
+        console.error('Error al eliminar archivo:', error.message);
+        return false;
+    }
+}; 
+
+// Exportar configuracion de multer y funcion de eliminacion
+module.exports = {
+    upload,
+    deleteFile
+};
