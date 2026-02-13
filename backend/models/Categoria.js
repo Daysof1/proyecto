@@ -5,7 +5,7 @@
  */
 
 //Importar DataType de sequelize 
-const {DataTypes } = require('sequelize');
+const { DataTypes } = require('sequelize');
 
 //importar instancia de sequelize
 const { sequelize } = require('../config/database');
@@ -138,4 +138,4 @@ Categoria.prototype.contarProductos = async function() {
 };
 
 //Exportar modelo Categoria
-Module.exports = Categoria;
+module.exports = Categoria;

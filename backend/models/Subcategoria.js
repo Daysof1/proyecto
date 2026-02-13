@@ -180,4 +180,4 @@ Subcategoria.prototype.obtenerCategoria = async function() {
     return await Categoria.findByPk(this.categoriaId);
 };
 //Exportar modelo Subcategoria
-Module.exports = Subcategoria;
+module.exports = Subcategoria;
