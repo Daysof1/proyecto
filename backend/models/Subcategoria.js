@@ -53,7 +53,7 @@ const Subcategoria = sequelize.define('Subcategoria', {
      * Esta es la relacion con la tabla categoria
      */
     categoriaId: {
-        type: DataTypes.INTERGER,
+        type: DataTypes.INTEGER,
         allowNull: false,
         references: {
             model: 'categorias', //nombre de la tabla relacionada
@@ -165,7 +165,7 @@ const Subcategoria = sequelize.define('Subcategoria', {
  * @returns {Promise<number>} - numero de productos
  */
 Subcategoria.prototype.contarProductos = async function() {
-    const Producto= require('/.Producto');
+    const Producto= require('./Producto');
     return await Producto.count({ 
         where: { subcategoriaId: this.id} });
 };
