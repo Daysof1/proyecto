@@ -30,7 +30,7 @@ const Categoria = sequelize.define('Categoria', {
             msg: 'Ya existe una categoria con ese nombre'
         },
         validate: {
-            notEmpy: {
+            notEmpty: {
                 msg: 'El nombre de la categoria no puede estar vacio'
             },
             len: {
@@ -56,8 +56,8 @@ const Categoria = sequelize.define('Categoria', {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: true
-    
     }
+
 }, {
     // Opciones dek modelo
 
@@ -121,7 +121,7 @@ const Categoria = sequelize.define('Categoria', {
  * @returns {Promise<number>} - numero de subcategoria
  */
 Categoria.prototype.contarSubcategorias = async function() {
-    const Subcategoria= require('/.Subcatergoria');
+    const Subcategoria= require('./Subcategoria');
     return await Subcategoria.count({ 
         where: { categoriaId: this.id} });
 };
@@ -132,7 +132,7 @@ Categoria.prototype.contarSubcategorias = async function() {
  * @returns {Promise<number>} - numero de productos
  */
 Categoria.prototype.contarProductos = async function() {
-    const Subcategoria= require('/.Producto');
+    const Producto = require('./Producto');
     return await Producto.count({ 
         where: { categoriaId: this.id} });
 };
