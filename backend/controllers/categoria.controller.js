@@ -86,7 +86,7 @@ const getCategoriasById = async (req, res) => {
                 {
                     model: Subcategoria,
                     as: 'subcategorias',
-                    attributes: ['id', 'nombre', 'descripcio', 'activo']
+                    attributes: ['id', 'nombre', 'descripcion', 'activo']
                 },
                 {
                     model: Producto,
