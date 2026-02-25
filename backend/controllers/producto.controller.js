@@ -7,69 +7,80 @@
 /**
  * Importar modelos
  */
-
 const Producto = require('../models/Producto');
-const Subcategoria = require('../models/Subcategoria');
 const Categoria = require('../models/Categoria');
+const Subcategoria = require('../models/Subcategoria');
+
+//importar path y fs para manejo de imagenes
+const path = require('path');
+const fs = require('fs');
 
 /**
- * obtener todas los prosuctos
+ * obtener todas los productos
  * query params:
  * categoriaId: Id de la categoria para filtrar por categoria
  * subcategoriaId: Id de la subcategoria para filtrar por subcategoria
- * Activo true/false (filtrar por estado)
- * incluir categoria true/false (incluir categorias relacionadas)
- * incluir subcategoria true/false (incluir subcategorias relacionadas)
- * 
+ * Activo true/false (filtrar por estado activo o inactivo)
  * @param {Object} req request Express
  * @param {Object} res response Express
  */
 
 const getProductos = async (req, res) => {
     try {
-        const { categoriaId, subcategoriaId, activo, incluirCategoria, incluirSubcategoria } = req.query
+        const {
+            categoriaId,
+            subcategoriaId, 
+            activo, 
+            conStock,
+            buscar,
+            pagina = 1,
+            limite = 100
+        } = req.query;
 
-        // Opciones de consulta
-        const opciones = {
-            order: [['nombre', 'ASC']] //ordenar de manera alfabetica
-        };
-
-        //Filtros
+        //Construir filtros
         const where = {};
         if (categoriaId) where.categoriaId = categoriaId;
         if (subcategoriaId) where.subcategoriaId = subcategoriaId;
         if (activo !== undefined) where.activo = activo === 'true';
+        if (conStock === 'true') where.stock = { [require('sequelize').Op.gt]: 0};
 
-        if(Object.keys(where).length > 0) {
-            opciones.where = where;
-        }
+        //paginacion
+        const offset = (parseInt(pagina) -1) * parseInt(limite);
 
-        // Incluir categoria si se solicita
-        if (incluirCategoria === 'true') {
-            opciones.include == [{
-                model: Categoria,
-                as: 'categoria', // campo del alias para la relacion 
-                attributes: [ 'id', 'nombre', 'activo'] //Campos a incluir de la categoria
-            }]
-        }
-        if (incluirSubcategoria === 'true') {
-            opciones.include == [{
-                model: Subcategoria,
-                as: 'subcategoria', // campo del alias para la relacion 
-                attributes: [ 'id', 'nombre', 'activo'] //Campos a incluir de la categoria
-            }]
-        }
+        // Opciones de consulta
+        const opciones = {
+            where,
+            include: [
+                {
+                    model: Categoria,
+                    as: 'categoria',
+                    attributes: ['id', 'nombre']
+                },
+                {
+                    model: Subcategoria,
+                    as: 'subcategoria',
+                    attributes: ['id', 'nombre']
+                }
+            ],
+            limit: parseInt(limite),
+            offset,
+            order: [['nombre', 'ASC']] //ordenar de manera alfabetica
+        };
 
-        // Obtener productos 
-        const productos = await Producto.findAll(opciones);
+        //obtener productos y total
+        const { count, rows: productos } = await Producto.findAndCountAll(opciones);
 
         //Respuesta exitosa
-
         res.json({
             sucess: true,
-            count: productos.length,
             data: {
-                productos
+                productos,
+                paginacion: {
+                    total: count,
+                    pagina: parseInt(pagina),
+                    limite: parseInt(limite),
+                    totalpagina: Math.ceil(count / parseInt(limite))
+                }
             }
         });
 
@@ -84,19 +95,19 @@ const getProductos = async (req, res) => {
 };
 
 /**
- * obtener todas las subcategorias por id
- * GET /api/subcategorias/:id
+ * obtener todas los productos por id
+ * GET /api/admin/productos/:id
  * 
  * @param {Object} req request Express
  * @param {Object} res response Express
  */
 
-const getSubcategoriasById = async (req, res) => {
+const getProductosById = async (req, res) => {
     try {
         const { id } = req.params;
 
-        //Buscar subcategorias y contar productos
-        const subcategoria = await Subcategoria. findAll( id, {
+        //Buscar productos con relacion
+        const producto = await Producto. findAll( id, {
             include: [
                 {
                     model: Categoria,
@@ -104,64 +115,58 @@ const getSubcategoriasById = async (req, res) => {
                     attributes: ['id', 'nombre', 'activo']
                 },
                 {
-                    model: Producto,
-                    as: 'productos',
-                    attributes: ['id']
+                    model: Subcategoria,
+                    as: 'subcategoria',
+                    attributes: ['id', 'nombre', 'activo']
                 }
             ]
         });
 
-        if (!subcategoria) {
+        if (!producto) {
             return res.status(404).json({
                 success: false,
-                message: 'Subcategoria no encontrada'
+                message: 'Subcategoria no encontrado'
             });
         }
-
-        //agregar contadpr de productos
-        const subcategoriaJSON = subcategoria.toJSON();
-        subcategoriaJSON.totalProductos = subcategoriaJSON.productos.length;
-        delete subcategoriaJSON.productos; //no enviar la lista completa, solo el contador
 
         // Respuesta Exitosa
         res.json({
             success: true,
             data: {
-                subcategoria: subcategoriaJSON
+                producto
             }
         });
 
 
     } catch (error) {
-        console.error('Error en getSubcategoriaById: ', error);
+        console.error('Error en getProductoById: ', error);
         res.status(500).json[{
             sucess: false,
-            message: 'Error al obtener subcategoria',
+            message: 'Error al obtener producto',
             error: error.message
         }]
     }
 };
 
 /**
- * Crear una subcategoria
- * POST /api/admin/subcategorias
- * Body: { nombre, descripcion, categoriaId }
+ * Crear un producto
+ * POST /api/admin/productos
  * @param {Object} req request Express
  * @param {Object} res response Express
  */
 
-const crearSubcategoria = async (req, res) => {
+const crearProducto = async (req, res) => {
     try {
-        const { nombre, descripcion, categoriaId } = req.body;
+        const { nombre, descripcion, precio, stock, categoriaId, subcategoriaId } = req.body;
 
         //validacion 1 verificar campos requeridos
-        if (!nombre || !categoriaId) {
+        if (!nombre || !precio || !categoriaId || !subcategoriaId) {
             return res.status(400).json({
                 success: false,
-                message: 'El nombre y categoriaId es requerido'
+                message: 'Fatan campos requeridos, nombre, precio, categoriaId y subcategoriaId'
             });
         }
-
+        /**
         //valida 2 si la categoria existe
         const categoria = await Categoria.findByPK(categoriaId);
 
@@ -171,54 +176,107 @@ const crearSubcategoria = async (req, res) => {
                 message: `No existe la categoria con id ${categoriaId}`
             });
         }
-
-        // Validacion 3 verifica si la categoria esta activa
+        */
+        // Validacion 2 verifica si la categoria esta activa
+        const categoria = await Categoria.findByPK(categoriaId);
+        if (!categoria) {
+            return res.status(400).json({
+                success: false,
+                message: `La categoria no existe una categoria con id ${categoriaId}`
+            });
+        }
         if (!categoria.activo) {
             return res.status(400).json({
                 success: false,
-                message: `La categoria "${categoria.nombre}" esta inactiva, activela primero`
+                message: `La categoria ${categoria.nombre} esta inactiva` 
             });
         }
 
-        // Validacion 4 verificar que el nombre no exista  una subcategoria con el mismo nombre
-        const subcategoriaExistente = await Subcategoria.findOne({ where: { nombre, categoriaId }
-        });
 
-        if (subcategoriaExistente) {
+        //valida 3 si la subcategoria existe y pertenece a una categoria
+        const subcategoria = await Subcategoria.findByPK(categoriaId);
+
+        if(!subcategoria) {
+            return res.status(404).json({
+                success: false,
+                message: `No existe la subcategoria con id ${subcategoriaId}`
+            });
+        }
+        // Validacion 3 verifica si la subcategoria esta activa
+        if (!subcategoria.activo) {
             return res.status(400).json({
                 success: false,
-                message : `Ya existe una subcategoria con el nombre "${nombre}" en esta categoria`
+                message: `La subcategoria "${subcategoria.nombre}" esta inactiva, activela primero`
+            });
+        }
+        if(!subcategoria.categoriaId !== parseInt(categoriaId)) {
+            return res.status(400).json({
+                success: false,
+                message: `La subcategoria ${subcategoria.nombre} no pertenece a la categoria con id ${categoriaId}`
+            });
+        }
+        //Validacion 4 perrecio
+        if(parseFloat(precio) < 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'El precio debe mayor a 0'
             });
         }
 
-        // Crear subcategoria
-        const nuevaSubcategoria = await Subcategoria.create({
+        if(parseInt(stock) < 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'El stock no puede ser negativo'
+            });
+        }
+
+        //obteber imagen
+        const imagen = req.file ? req.file.filename : null;
+    
+        // Crear producto
+        const nuevoProducto = await Producto.create({
             nombre,
             descripcion: descripcion || null, //si no se proporciona la descripcion se establece como null
-            categoriaId,
+            precio: parseFloat(precio),
+            stock: parseInt(stock),
+            categoriaId: parseInt(categoriaId),
+            subcategoriaId: parseInt(subcategoriaId),
+            imagen,
             activo: true
         });
 
-        //Obtener subcategoria con los datos de la categoria
-        const subcategoriaConCategoria = await Subcategoria.findByPK(nuevaSubcategoria.id, {
-            include: [{
-                model: Categoria,
-                as: 'categoria',
-                attributes: ['id', 'nombre']
-            }]
+        // Recargar con relaciones
+        await nuevoProducto.reload({
+            include: [
+                { model: Categoria, as: 'categoria', attributes: ['id', 'nombre'] },
+                { model: Subcategoria, as: 'subcategoria', attributes: ['id', 'nombre'] },
+            ]
         });
         
         //Respuesta exitosa
         res.status(201).json({
             success: true,
-            message: 'Subcategoria creada exitosamente',
+            message: 'Producto creado exitosamente',
             data: {
-                subcategoria: subcategoriaConCategoria
+                producto: nuevoProducto
             }
         });
+
     } catch (error) {
-        console.error('Error en crearSubcategoria', error);
-        if (error.name === 'SequelizeValidationError') {
+        console.error('Error en crearProducto', error);
+
+        //si hubo error eliminar la imagen subida
+        if (req.file) {
+            const rutaImagen = path.join(__dirname, '../uploads', req.file.filename);
+            try {
+                await fs.unlink(rutaImagen);
+            } catch (err) {
+                console.error('Error al eliminar imagen: ', err);
+            }
+        }
+
+        if (error.name === 'SequelizeValidationError') 
+        {
         return res.status(400).json({
             success: false,
             message: 'Error de validacion',
@@ -227,35 +285,35 @@ const crearSubcategoria = async (req, res) => {
     }
     res.status(500).json({
         success: false, 
-        message: 'Error al crear subcategoria',
+        message: 'Error al crear producto',
         error: error.message
     })
 }
 };
 
 /**
- * Actualizar subcategoria
- * PUT /api/admin/subcategorias/:id
- * body: { nombre, descripcion, categoriaId }
+ * Actualizar producto
+ * PUT /api/admin/prosuctos/:id
+ * body: { nombre, descripcion, categoriaId, subcategoriaId }
  * @param {Object} req request Express
  * @param {Object} res response Express
  */
 
-const actualizarSubcategoria = async (req, res) => {
+const actualizarProducto = async (req, res) => {
     try {
         const { id } = req.params;
-        const { nombre, descripcion, categoriaId, activo } = req.body;
+        const { nombre, descripcion, precio, stock, categoriaId, subcategoriaId } = req.body;
         
-        //Buscar subcategoria
-       const subcategoria = await Subcategoria.findByPK(id);
+        //Buscar producto
+       const producto = await Producto.findByPK(id);
 
-       if(!subcategoria) {
+       if(!producto) {
         return res.status(404).json({
             success: false,
-            message: 'Subcategoria no encontrada'
+            message: 'Producto no encontrada'
             });
         }
-        if (categoriaId && categoriaId !== subcategoria.categoriaId) {
+        if (categoriaId && categoriaId !== producto.productoId) {
             const nuevaCategoria = await Categoria.findByPK(categoriaId);
 
             if (nuevaCategoria) {
@@ -273,38 +331,59 @@ const actualizarSubcategoria = async (req, res) => {
             }
         }
 
-        // validacion 1 si se cambia el nombre verificar que no exista 
-        if (nombre && nombre !== subcategoria.nombre ) {
-            const categoriafinal = categoriaId || subcategoria.categoriaId; //Si no se cambia la categoria usar la categoria actuañ
+        if (subcategoriaId && subcategoriaId !== producto.productoId) {
+            const nuevaSubcategoria = await Subcategoria.findByPK(subcategoriaId);
 
-            const subcategoriaConMismoNombre = await Subcategoria.findOne({ 
+            if (nuevaSubcategoria) {
+                return res.status(404).json({
+                    success: false,
+                    message: `No existe la subcategoria con id ${subcategoriaId}`
+                });
+            }
+
+            if (!nuevaSubcategoria.activo) {
+                return res.status(400).json({
+                    sucess: false,
+                    message: `La Subcategoria ${nuevaSubcategoria.nombre} esta inactiva`
+                });
+            }
+        }
+
+        // validacion 1 si se cambia el nombre verificar que no exista 
+        if (nombre && nombre !== producto.nombre ) {
+            const categoriafinal = categoriaId || producto.productoId; //Si no se cambia la categoria usar la categoria actuañ
+
+            const productoConMismoNombre = await Producto.findOne({ 
                 where: { 
                     nombre, 
                     categoriaId: categoriafinal
                 }
             });
 
-            if (subcategoriaConMismoNombre) {
+            if (productoConMismoNombre) {
                 return res.status(400).json({
                     success: false,
-                    message: `Ya existe una subcategoria con el nombre "${nombre}" en esta categoria`
+                    message: `Ya existe un producto con el nombre "${nombre}" en esta categoria`
                 });
             }
         }
 
         //Actualizar campos
-        if (nombre !== undefined) subcategoria.nombre = nombre;
-        if (descripcion !== undefined) subcategoria.descripcion = descripcion;
-        if (categoriaId !== undefined) subcategoria.categoriaId = categoriaId;
-        if (activo !== undefined) subcategoria.activo = activo;
+        if (nombre !== undefined) producto.nombre = nombre;
+        if (descripcion !== undefined) producto.descripcion = descripcion;
+        if (precio !== undefined) producto.precio = precio;
+        if (stock !== undefined) producto.stock = stock;
+        if (categoriaId !== undefined) producto.categoriaId = categoriaId;
+        if (subcategoriaId !== undefined) producto.subcategoriaId = subcategoriaId;
+        if (activo !== undefined) producto.activo = activo;
 
         //guardar cambios
-        await subcategoria.save();
+        await producto.save();
 
         //respuesta exitosa
         res.json({
             success: true,
-            message: 'Subategoria actualizada exitosamnete',
+            message: 'Producto actualizada exitosamnete',
             data: {
                 subcategoria
             }
@@ -323,7 +402,7 @@ const actualizarSubcategoria = async (req, res) => {
 
         res.status(500).json ({
             sucess: false,
-            message: 'error al actualizar subcategoria',
+            message: 'error al actualizar producto',
             error: error.message
         });
     }
@@ -336,7 +415,7 @@ const actualizarSubcategoria = async (req, res) => {
  * @param {Object} req request Express
  * @param {Object} res response Express
  */
-const toggleSubcategoria = async (req, res) => {
+const toggleProducto = async (req, res) => {
     try {
         const { id } = req.params;
 
@@ -387,7 +466,7 @@ const toggleSubcategoria = async (req, res) => {
  * @param {Object} req request Express
  * @param {Object} res response Express
  */
-const eliminarSubcategoria = async (req,res) => {
+const eliminarProducto = async (req,res) => {
     try {
         const { id } = req.params;
 
@@ -443,7 +522,7 @@ const eliminarSubcategoria = async (req,res) => {
  * @param {Object} req request Express
  * @param {Object} res response Express
  */
-const getEstadisticasSubcategoria = async (req, res)  => {
+const getEstadisticasProducto = async (req, res)  => {
     try {
         const { id } = req.params;
 
