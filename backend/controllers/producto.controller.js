@@ -293,8 +293,8 @@ const crearProducto = async (req, res) => {
 
 /**
  * Actualizar producto
- * PUT /api/admin/prosuctos/:id
- * body: { nombre, descripcion, categoriaId, subcategoriaId }
+ * PUT /api/admin/productos/:id
+ * body: { nombre, descripcion, precio, stock, categoriaId, subcategoriaId }
  * @param {Object} req request Express
  * @param {Object} res response Express
  */
@@ -302,7 +302,7 @@ const crearProducto = async (req, res) => {
 const actualizarProducto = async (req, res) => {
     try {
         const { id } = req.params;
-        const { nombre, descripcion, precio, stock, categoriaId, subcategoriaId } = req.body;
+        const { nombre, descripcion, precio, stock, categoriaId, subcategoriaId, activo } = req.body;
         
         //Buscar producto
        const producto = await Producto.findByPK(id);
@@ -313,32 +313,65 @@ const actualizarProducto = async (req, res) => {
             message: 'Producto no encontrada'
             });
         }
-        if (categoriaId && categoriaId !== producto.productoId) {
-            const nuevaCategoria = await Categoria.findByPK(categoriaId);
+        if (categoriaId && categoriaId !== producto.categoriaId)
+             {
+            const categoria = await Categoria.findByPK(categoriaId);
 
-            if (nuevaCategoria) {
+            if (!categoria || !categoria.activo) {
                 return res.status(404).json({
                     success: false,
-                    message: `No existe la categoria con id ${categoriaId}`
-                });
-            }
-
-            if (!nuevaCategoria.activo) {
-                return res.status(400).json({
-                    sucess: false,
-                    message: `La categoria ${nuevaCategoria.nombre} esta inactiva`
+                    message: 'Categoria invalida o inactiva'
                 });
             }
         }
 
-        if (subcategoriaId && subcategoriaId !== producto.productoId) {
-            const nuevaSubcategoria = await Subcategoria.findByPK(subcategoriaId);
+        if (subcategoriaId && subcategoriaId !== producto.subcategoriaId)
+             {
+            const subcategoria = await Subcategoria.findByPK(subcategoriaId);
 
-            if (nuevaSubcategoria) {
+            if (!subcategoria || !subcategoria.activo) {
                 return res.status(404).json({
                     success: false,
-                    message: `No existe la subcategoria con id ${subcategoriaId}`
+                    message: 'Subcategoria invalida o inactiva'
                 });
+            }
+
+            const catId = categoriaId || producto.categoriaId
+            if (!subcategoria.categoriaId !== parseInt(catId)) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'La subcategoria no pertenece a la categoria seleccionada'
+                });
+            }
+        }
+
+            //validar precio
+            if(precio !== undefined && parseFloat(precio) < 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'El precio debe mayor a 0'
+            });
+            }
+
+            if(stock !== undefined && parseInt(stock) < 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'El stock no puede ser negativo'
+                });
+            }
+
+            //Manejar imagen
+            if (req.file) {
+                //Eliminar imagen anterior si existe
+                if(producto.imagen) {
+                    const rutaImagenAnterior = path.join(__dirname, '../uploads', producto.imagen);
+                    try {
+                        await fs.unlink(rutaImagenAnterior);
+                    } catch (err) {
+                        console.error('Error al eliminar imagen anterior: ',err);
+                    }
+                }
+                producto.imagen = req.file.filename
             }
 
             if (!nuevaSubcategoria.activo) {
@@ -347,34 +380,14 @@ const actualizarProducto = async (req, res) => {
                     message: `La Subcategoria ${nuevaSubcategoria.nombre} esta inactiva`
                 });
             }
-        }
-
-        // validacion 1 si se cambia el nombre verificar que no exista 
-        if (nombre && nombre !== producto.nombre ) {
-            const categoriafinal = categoriaId || producto.productoId; //Si no se cambia la categoria usar la categoria actuañ
-
-            const productoConMismoNombre = await Producto.findOne({ 
-                where: { 
-                    nombre, 
-                    categoriaId: categoriafinal
-                }
-            });
-
-            if (productoConMismoNombre) {
-                return res.status(400).json({
-                    success: false,
-                    message: `Ya existe un producto con el nombre "${nombre}" en esta categoria`
-                });
-            }
-        }
 
         //Actualizar campos
         if (nombre !== undefined) producto.nombre = nombre;
         if (descripcion !== undefined) producto.descripcion = descripcion;
-        if (precio !== undefined) producto.precio = precio;
-        if (stock !== undefined) producto.stock = stock;
-        if (categoriaId !== undefined) producto.categoriaId = categoriaId;
-        if (subcategoriaId !== undefined) producto.subcategoriaId = subcategoriaId;
+        if (precio !== undefined) producto.precio = parseFloat(precio);
+        if (stock !== undefined) producto.stock = parseInt(stock);
+        if (categoriaId !== undefined) producto.categoriaId = parseInt(categoriaId);
+        if (subcategoriaId !== undefined) producto.subcategoriaId = parseInt(subcategoriaId);
         if (activo !== undefined) producto.activo = activo;
 
         //guardar cambios
@@ -385,12 +398,20 @@ const actualizarProducto = async (req, res) => {
             success: true,
             message: 'Producto actualizada exitosamnete',
             data: {
-                subcategoria
+                producto
             }
         });
 
     } catch (error) {
-        console.error('Error en actualizarSubcategoria: ', error);
+        console.error('Error en actualizarProducto: ', error);
+        if (req.file) {
+             const rutaImagen = path.join(__dirname, '../uploads', req.file.filename);
+            try {
+                await fs.unlink(rutaImagen);
+            } catch (err) {
+                console.error('Error al eliminar imagen: ', err);
+            }
+        }
 
         if (error.name === 'SequelizeValidationError') {
             return res.status(400).json({
@@ -409,9 +430,8 @@ const actualizarProducto = async (req, res) => {
 };
 
 /**
- * Activar/Desactivar subcategoria
- * PATCH /api/admin/subcategorias/:id/estado
- * Al desacrivar una subcategorias se desactivan todos los productos relacionados
+ * Activar/Desactivar producto
+ * PATCH /api/admin/productos/:id/estado
  * @param {Object} req request Express
  * @param {Object} res response Express
  */
@@ -419,50 +439,41 @@ const toggleProducto = async (req, res) => {
     try {
         const { id } = req.params;
 
-        //Buscar categoria
-        const subcategoria = await Subcategoria.findByPK(id);
+        //Buscar producto
+        const producto = await Producto.findByPK(id);
 
-        if(!subcategoria) {
+        if(!producto) {
             return res.status(404).json({
                 success: false, 
-                message: 'Subategoria no encontrada'
+                message: 'Producto no encontrada'
             });
         }
 
-        // Alternar estado activo
-        const nuevoEstado = !subcategoria.activo;
-        subcategoria.activo = nuevoEstado;
-
-        // Guardar cambios
-        await subcategoria.save();
-
-        //Contar cuantos registros se afectaron 
-        const productosAfectados = await Producto.count({ where: { subcategoriaId: id }
-        });
+        producto.activo = !producto.activo;
+        await producto.save();
 
         //Respuesta exitosa
         res.json({
             success: true,
-            message: `Subategoria ${nuevoEstado ? 'activada' : 'desactivada'} exitosamente`,
+            message: `Producto ${nuevoEstado ? 'activada' : 'desactivada'} exitosamente`,
             data:{
-                subcategoria,
-                productosAfectados
+                producto,
             }
         });
     } catch (error) {
-        console.error ('Error en toggleSubategoria:', error);
+        console.error ('Error en togglePrducto:', error);
         res.status(500).json({
             success: false,
-            messsage: 'Error al cambiar estado de la subcategoria',
+            messsage: 'Error al cambiar estado del producto',
             error: error.message
         });
     }
 };
 
 /**
- * Eliminar subcategoria 
- * DELETE /api/admin/subcategorias/:id
- * Solo permite eliminar si no productos relacionados
+ * Eliminar producto
+ * DELETE /api/admin/productos/:id
+ * Elimina el producto y su imagen
  * @param {Object} req request Express
  * @param {Object} res response Express
  */
@@ -470,142 +481,125 @@ const eliminarProducto = async (req,res) => {
     try {
         const { id } = req.params;
 
-        //Buscar categoria
-        const subcategoria = await Subcategoria.findByPK(id);
+        //Buscar producto 
+        const producto = await Producto.findByPK(id);
 
-        if (!subcategoria) {
+        if (!producto) {
             return res.status(404).json({
                 success: false,
-                message: 'Subcategoria no encontrada'
+                message: 'Producto no encontrada'
             });
         }
 
-        // Validacion verificar que no tenga productos
-        const productos = await Producto.count({
-            where: { subcategoriaId: id}
-        });
-
-        if (productos > 0) {
-            return res.status(400).json({
-                success: false,
-                message: `No se puede eliminar la subcategoria porque tiene ${productos} productos asociadas usa PATCH /api/admin/categorias/:id toggle para para desactivarla en lugar de eliminarla`
-            });
-        }
-
-        //Eiminar subcategoria
-        await subcategoria.destroy();
+        //El hook beforeDestroy se encarga de eliminar la imagen
+        //Eiminar producto
+        await producto.destroy();
 
         //Respuesta exitosa
         res.json({
             success: true,
-            message: 'Subategoria eliminada exitosamente'
+            message: 'producto eliminada exitosamente'
         });
 
     } catch (error) {
-        console.error ('Error al eliminar subcategoria', error);
+        console.error ('Error al eliminar producto', error);
         res.status(500).json({
             success: false,
-            message: 'Error al eliminar subcategoria', 
+            message: 'Error al eliminar producto', 
             error: error.message
         });
     }
 };
 
 /**
- * Obtener estadisticas de una categoria
- * GET /api/admin/subcategorias estadistucas
- * retorna
- * Total de subcategorias activas /inactivas
- * Total de productos activas /inactivas
- * valor total del inventario
- * stock total
+ * Actualizar stock de un producto
+ * 
+ * PATCH api/admin/productos/:id/stock
+ * body: {cantidad, operacion: 'aumentar' | 'reducir', | 'establecer' }
  * @param {Object} req request Express
  * @param {Object} res response Express
  */
-const getEstadisticasProducto = async (req, res)  => {
+const actualizarStock =  async (req, res) => {
     try {
-        const { id } = req.params;
+        const { id } = req.params
+        const { cantidad, operacion } = req.body;
 
-        //Verificar que la subcategoria exista
-        const subcategoria = await Subcategoria.findByPK(id [{
-            include: [{
-                model: Categoria,
-                as: 'categoria',
-                attributes: ['id', 'nombre']
-            }]
-        }]);
+        if (!cantidad || !operacion) {
+            return res.status(400).json({
+                success: false,
+                message: 'Se requiere cantidad y operacion'
+            });
+        }
+        const cantidadNUm = parseInt(cantidad);
+        if (cantidadNUm < 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'La cantidad no puede ser negativa'
+            });
+        }
+        const producto = await Producto.findByPK(id);
 
-        if (!subcategoria) {
+        if (!producto) {
             return res.status(404).json({
-                sucess: false,
-                message: 'Subcategoria no encontrada'
+                success: false,
+                message: 'Producto no encontrado'
             });
         }
 
-        // contar productos
-        const totalProductos = await Producto.count({
-            where: { subcategoriaId: id }
-        });
-        const productosActivos = await Producto.count({
-            where: { subcategoriaId: id, activo: true }
-        });
+        let nuevoStock;
 
-        // Obtener productos para calcular estadisticas
-        const productos = await Producto.findAll({
-            where: { subcategoriaId: id},
-            attributes: ['precio', 'stock']
-        });
-
-        //calcular estadisticas de inventario
-        let valorTotalInventario = 0;
-        let stockTotal = 0;
-
-        productos.forEach(producto => {
-            valorTotalInventario += parseFloat(producto.precio) * producto.stock;
-        });
-
-        //Respuesta exitosa
-
-        res.json({
-            success: true,
-            data: {
-                subcategoria: {
-                    id: subcategoria.id,
-                    nombre: subcategoria.nombre,
-                    activo: subcategoria.activo,
-                    categoria: subcategoria.categoriaId
-                },
-                estadisticas: {
-
-                    productos: {
-                        total: totalProductos,
-                        activos: productosActivos,
-                        inactivos: totalProductos - productosActivos
-                    },
-                    inventario: {
-                        stockTotal,
-                        valorTotal: valorTotalInventario.toFixed(2) //quitar los decimales
-                    }
+        switch (operacion) {
+            case 'aumentar':
+                nuevoStock = producto.aumentarStock(cantidadNUm);
+                break;
+            case 'reducir':
+                if (cantidadNUm > producto.stock) {
+                    return res.status(400).json({
+                        success: false,
+                        message: `No hay suficiente stock. Stock actual: ${producto.stock}`
+                    });
                 }
+                nuevoStock = producto.reducirStock(cantidadNUm);
+                break;
+            case 'establecer':
+                nuevoStock = cantidadNUm;
+                break;
+            default: 
+                return res.status(400).json({
+                    success: false,
+                    message: 'Operacion invalida usa aumentar, reducir o establecer'
+                });
             }
 
-        });
-    } catch(error) {
-        console.error('Error en getEstadisticasSubcategoria: ',error);
-        res.status(500).json({
-            success: false,
-            message: 'Error al obtener estadisticas',
-            error: error.message
-        })
-    }
-};
+            producto.stock = nuevoStock;
+            await producto.save();
+
+            res.json({
+                success: true, 
+                message: `Stock ${oprecion === 'aumentar' ? 'aumentado' : operacion === 'reducir' ? 'reducido' : 'establecido'} exitosamente`,
+                data: {
+                    productoId : producto.id,
+                    nombre: producto.nombre,
+                    stockAnterior: operacion === 'establecer' ? null : (operacion === 'aumentar' ? producto.stock - cantidadNUm : producto.stock + cantidadNUm),
+                    stockNuevo: producto.stock
+                }
+            });
+        } catch (error) {
+            console.error('Error en actualizarStock', error);
+            res.status(500).json({
+                success: false,
+                message: 'Error al actualizar stock',
+                error: error.message
+            });
+        }
+    };
 //Exportar todos los controladores
 module.exports = {
-    getSubategorias,
-    getSubcategoriasById,
-    crearSubcategoria,
-    actualizarSubcategoria,
-    toggleSubcategoria,
-    eliminarSubcategoria,
-    getEstadisticasSubcategoria
+    getProductos,
+    getProductosById,
+    crearProducto,
+    actualizarProducto,
+    toggleProducto,
+    eliminarProducto,
+    actualizarStock
 };
