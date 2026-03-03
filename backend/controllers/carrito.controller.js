@@ -67,7 +67,7 @@ const getCarrito = async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Error al obtener carrito',
-            error: message.error
+            error: error.message
         })
     }
 };
@@ -194,7 +194,7 @@ const agregarAlCarrito = async (req, res) => {
         res.status(500).json({
             sucess:false,
             message: 'Error al agregar producto al carrito',
-            error: message.error
+            error: error.message
         });
     }
 };
@@ -264,7 +264,7 @@ const actualizarItemCarrito = async (req, res) => {
         res.status(500).json({
             sucess:false,
             message: 'Error al actualizar item del carrito',
-            error: message.error
+            error: error.message
         });
     }
 };
@@ -307,7 +307,7 @@ const eliminarItemCarriro = async (req, res) => {
         res.status(500).json({
             sucess:false,
             message: 'Error al eliminar item del carrito',
-            error: message.error
+            error: error.message
         });
     }
 };
@@ -338,7 +338,7 @@ const vaciarCarrito = async (req, res) => {
         res.status(500).json({
             sucess:false,
             message: 'Error al vaciar el carrito',
-            error: message.error
+            error: error.message
         });
     }
 ;}
