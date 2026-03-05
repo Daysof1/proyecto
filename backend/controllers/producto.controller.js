@@ -107,7 +107,7 @@ const getProductosById = async (req, res) => {
         const { id } = req.params;
 
         //Buscar productos con relacion
-        const producto = await Producto. findAll( id, {
+        const producto = await Producto.findAll( id, {
             include: [
                 {
                     model: Categoria,
@@ -125,7 +125,7 @@ const getProductosById = async (req, res) => {
         if (!producto) {
             return res.status(404).json({
                 success: false,
-                message: 'Subcategoria no encontrado'
+                message: 'Producto no encontrado'
             });
         }
 
