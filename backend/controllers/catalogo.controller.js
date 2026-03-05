@@ -105,7 +105,7 @@ const getProductos = async (req, res) => {
 
         //Respuesta exitosa
         res.json({
-            sucess: true,
+            success: true,
             data: {
                 productos,
                 paginacion: {
@@ -120,7 +120,7 @@ const getProductos = async (req, res) => {
     } catch (error) {
         console.error('Error en getProductos: ', error);
         res.status(500).json[{
-            sucess: false,
+            success: false,
             message: 'Error al obtener productos',
             error: error.message
         }]
@@ -180,7 +180,7 @@ const getProductosById = async (req, res) => {
     } catch (error) {
         console.error('Error en getProductoById: ', error);
         res.status(500).json[{
-            sucess: false,
+            success: false,
             message: 'Error al obtener producto',
             error: error.message
         }]
@@ -236,7 +236,7 @@ const getCategorias = async (req, res) => {
     } catch (error) {
         console.error('Error en getCategoria: ', error);
         res.status(500).json[{
-            sucess: false,
+            success: false,
             message: 'Error al obtener categoria',
             error: error.message
         }]
@@ -312,7 +312,7 @@ const getSubcategoriasPorCategorias = async (req, res) => {
     } catch (error) {
         console.error('Error en getSubcategoria: ', error);
         res.status(500).json[{
-            sucess: false,
+            success: false,
             message: 'Error al obtener subcategoria',
             error: error.message
         }]
@@ -367,7 +367,7 @@ const getProductosDestacados = async (req, res) => {
     } catch (error) {
         console.error('Error en getProductosDestacados: ', error);
         res.status(500).json[{
-            sucess: false,
+            success: false,
             message: 'Error al obtener productos destacados',
             error: error.message
         }]

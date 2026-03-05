@@ -72,7 +72,7 @@ const getProductos = async (req, res) => {
 
         //Respuesta exitosa
         res.json({
-            sucess: true,
+            success: true,
             data: {
                 productos,
                 paginacion: {
@@ -87,7 +87,7 @@ const getProductos = async (req, res) => {
     } catch (error) {
         console.error('Error en getProductos: ', error);
         res.status(500).json[{
-            sucess: false,
+            success: false,
             message: 'Error al obtener productos',
             error: error.message
         }]
@@ -141,7 +141,7 @@ const getProductosById = async (req, res) => {
     } catch (error) {
         console.error('Error en getProductoById: ', error);
         res.status(500).json[{
-            sucess: false,
+            success: false,
             message: 'Error al obtener producto',
             error: error.message
         }]
@@ -376,7 +376,7 @@ const actualizarProducto = async (req, res) => {
 
             if (!nuevaSubcategoria.activo) {
                 return res.status(400).json({
-                    sucess: false,
+                    success: false,
                     message: `La Subcategoria ${nuevaSubcategoria.nombre} esta inactiva`
                 });
             }
@@ -422,7 +422,7 @@ const actualizarProducto = async (req, res) => {
         }
 
         res.status(500).json ({
-            sucess: false,
+            success: false,
             message: 'error al actualizar producto',
             error: error.message
         });

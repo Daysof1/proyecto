@@ -184,7 +184,7 @@ const crearPedido = async (req, res) => {
         await t.rollback();
         console.error('Error en crear el pedido:', error);
         res.status(500).json({
-            sucess:false,
+            success:false,
             message: 'Error al crear el pedido',
             error: error.message
         });
@@ -244,7 +244,7 @@ const getMisPedidos = async (req, res) => {
     } catch (error) {
         console.error('Error en GetPedidos:', error);
         res.status(500).json({
-            sucess:false,
+            success:false,
             message: 'Error al obtener los pedidos',
             error: error.message
         });
@@ -316,7 +316,7 @@ const getPedidosById = async (req, res) => {
     } catch (error) {
         console.error('Error en obtener el pedido:', error);
         res.status(500).json({
-            sucess:false,
+            success:false,
             message: 'Error al obtener el pedido',
             error: error.message
         });
@@ -396,7 +396,7 @@ const cancelarPedido = async (req, res) => {
         await t.rollback();
         console.error('Error al cancelar el pedido:', error);
         res.status(500).json({
-            sucess:false,
+            success:false,
             message: 'Error al cancelar el pedido',
             error: error.message
         });
@@ -459,7 +459,7 @@ const getAllPedidos = async (req, res) => {
     } catch (error) {
         console.error('Error al getAllPedidos:', error);
         res.status(500).json({
-            sucess:false,
+            success:false,
             message: 'Error al obtener los pedidos',
             error: error.message
         });
@@ -490,7 +490,7 @@ const actualizarEstadoPedido = async (req, res) => {
         const pedido = await Pedido.findByPK(id);
         if (!pedido) {
             return res.status(404).json({
-                sucess: false,
+                success: false,
                 message: 'El pedido no fe encontrado '
             });
         }
@@ -522,7 +522,7 @@ const actualizarEstadoPedido = async (req, res) => {
     } catch (error) {
         console.error('Error al actualizarEstadosPedidos:', error);
         res.status(500).json({
-            sucess:false,
+            success:false,
             message: 'Error al actualizar los estados del pedido',
             error: error.message
         });
@@ -581,7 +581,7 @@ const getEstadisticasPedidos = async (req, res) => {
     } catch (error) {
         console.error('Error al getEstadisticasPedidos:', error);
         res.status(500).json({
-            sucess:false,
+            success:false,
             message: 'Error al obtener las estadisticas',
             error: error.message
         });

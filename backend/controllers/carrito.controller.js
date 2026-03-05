@@ -192,7 +192,7 @@ const agregarAlCarrito = async (req, res) => {
     } catch (error) {
         console.error('Error en agregarAlCarrito:', error);
         res.status(500).json({
-            sucess:false,
+            success:false,
             message: 'Error al agregar producto al carrito',
             error: error.message
         });
@@ -215,7 +215,7 @@ const actualizarItemCarrito = async (req, res) => {
         const cantidadNum = parseInt(cantidad);
         if (cantidadNum < 1) {
             return res.status(400).json({
-                sucess: false,
+                success: false,
                 message: 'La cantidad debe ser al menos 1'
             });
         }
@@ -262,7 +262,7 @@ const actualizarItemCarrito = async (req, res) => {
     } catch (error) {
         console.error('Error en actualizar ItemCarrito:', error);
         res.status(500).json({
-            sucess:false,
+            success:false,
             message: 'Error al actualizar item del carrito',
             error: error.message
         });
@@ -305,7 +305,7 @@ const eliminarItemCarriro = async (req, res) => {
     } catch (error) {
         console.error('Error en eliminarItemCarrito:', error);
         res.status(500).json({
-            sucess:false,
+            success:false,
             message: 'Error al eliminar item del carrito',
             error: error.message
         });
@@ -336,7 +336,7 @@ const vaciarCarrito = async (req, res) => {
     } catch (error) {
         console.error('Error en vaciarCarrito:', error);
         res.status(500).json({
-            sucess:false,
+            success:false,
             message: 'Error al vaciar el carrito',
             error: error.message
         });
