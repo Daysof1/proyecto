@@ -204,7 +204,7 @@ const actualizarCategoria = async (req, res) => {
         const { nombre, descripcion } = req.body;
 
         //Buscar categoria
-       const categoria = await Categoria.findByPK(id);
+       const categoria = await Categoria.findByPk(id);
 
        if(!categoria) {
         return res.status(404).json({
@@ -276,7 +276,7 @@ const toggleCategoria = async (req, res) => {
         const { id } = req.params;
 
         //Buscar categoria
-        const categoria = await Categoria.findByPK(id);
+        const categoria = await Categoria.findByPk(id);
 
         if(!categoria) {
             return res.status(404).json({
@@ -334,7 +334,7 @@ const eliminarCategoria = async (req,res) => {
         const { id } = req.params;
 
         //Buscar categoria
-        const categoria = await Categoria.findByPK(id);
+        const categoria = await Categoria.findByPk(id);
 
         if (!categoria) {
             return res.status(404).json({
@@ -402,7 +402,7 @@ const getEstadisticasCategoria = async (req, res)  => {
         const { id } = req.params;
 
         //Verificar que la categoria exisa
-        const categoria = await Categoria.findByPK(id);
+        const categoria = await Categoria.findByPk(id);
 
         if (!categoria) {
             return res.status(404).json({

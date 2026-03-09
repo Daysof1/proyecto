@@ -239,7 +239,7 @@ const updateMe = async (req, res) => {
         const { nombre, apellido, telefono, direccion } = req.body;
 
         //Buscar usuario
-       const usuario = await Usuario.findByPK(req.usuario.id);
+       const usuario = await Usuario.findByPk(req.usuario.id);
 
        if(!usuario) {
         return res.status(404).json({

@@ -168,7 +168,7 @@ const crearProducto = async (req, res) => {
         }
         /**
         //valida 2 si la categoria existe
-        const categoria = await Categoria.findByPK(categoriaId);
+        const categoria = await Categoria.findByPk(categoriaId);
 
         if(!categoria) {
             return res.status(404).json({
@@ -178,7 +178,7 @@ const crearProducto = async (req, res) => {
         }
         */
         // Validacion 2 verifica si la categoria esta activa
-        const categoria = await Categoria.findByPK(categoriaId);
+        const categoria = await Categoria.findByPk(categoriaId);
         if (!categoria) {
             return res.status(400).json({
                 success: false,
@@ -194,7 +194,7 @@ const crearProducto = async (req, res) => {
 
 
         //valida 3 si la subcategoria existe y pertenece a una categoria
-        const subcategoria = await Subcategoria.findByPK(categoriaId);
+        const subcategoria = await Subcategoria.findByPk(categoriaId);
 
         if(!subcategoria) {
             return res.status(404).json({
@@ -305,7 +305,7 @@ const actualizarProducto = async (req, res) => {
         const { nombre, descripcion, precio, stock, categoriaId, subcategoriaId, activo } = req.body;
         
         //Buscar producto
-       const producto = await Producto.findByPK(id);
+       const producto = await Producto.findByPk(id);
 
        if(!producto) {
         return res.status(404).json({
@@ -315,7 +315,7 @@ const actualizarProducto = async (req, res) => {
         }
         if (categoriaId && categoriaId !== producto.categoriaId)
              {
-            const categoria = await Categoria.findByPK(categoriaId);
+            const categoria = await Categoria.findByPk(categoriaId);
 
             if (!categoria || !categoria.activo) {
                 return res.status(404).json({
@@ -327,7 +327,7 @@ const actualizarProducto = async (req, res) => {
 
         if (subcategoriaId && subcategoriaId !== producto.subcategoriaId)
              {
-            const subcategoria = await Subcategoria.findByPK(subcategoriaId);
+            const subcategoria = await Subcategoria.findByPk(subcategoriaId);
 
             if (!subcategoria || !subcategoria.activo) {
                 return res.status(404).json({
@@ -440,7 +440,7 @@ const toggleProducto = async (req, res) => {
         const { id } = req.params;
 
         //Buscar producto
-        const producto = await Producto.findByPK(id);
+        const producto = await Producto.findByPk(id);
 
         if(!producto) {
             return res.status(404).json({
@@ -482,7 +482,7 @@ const eliminarProducto = async (req,res) => {
         const { id } = req.params;
 
         //Buscar producto 
-        const producto = await Producto.findByPK(id);
+        const producto = await Producto.findByPk(id);
 
         if (!producto) {
             return res.status(404).json({
@@ -537,7 +537,7 @@ const actualizarStock =  async (req, res) => {
                 message: 'La cantidad no puede ser negativa'
             });
         }
-        const producto = await Producto.findByPK(id);
+        const producto = await Producto.findByPk(id);
 
         if (!producto) {
             return res.status(404).json({

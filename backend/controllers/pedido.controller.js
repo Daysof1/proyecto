@@ -487,7 +487,7 @@ const actualizarEstadoPedido = async (req, res) => {
         }
 
         //buscar pedido
-        const pedido = await Pedido.findByPK(id);
+        const pedido = await Pedido.findByPk(id);
         if (!pedido) {
             return res.status(404).json({
                 success: false,

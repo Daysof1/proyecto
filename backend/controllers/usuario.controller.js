@@ -90,7 +90,7 @@ const getUsuarioById = async (req, res) => {
         const { id } = req.params;
 
         // Buscar usuarios 
-        const usuario = await Usuario.findByPK( id, {
+        const usuario = await Usuario.findByPk( id, {
             attributes: { exclude: ['password'] },
         });
 
@@ -208,7 +208,7 @@ const actualizarUsuario = async (req, res) => {
         const { nombre, apellido, email, password, rol, telefono, direccion } = req.body;
 
         //Buscar usuario
-       const usuario = await Usuario.findByPK(id);
+       const usuario = await Usuario.findByPk(id);
 
        if(!usuario) {
         return res.status(404).json({
@@ -276,7 +276,7 @@ const toggleUsuario = async (req, res) => {
         const { id } = req.params;
 
         //Buscar usuario
-        const usuario = await Usuario.findByPK(id);
+        const usuario = await Usuario.findByPk(id);
 
         if(!usuario) {
             return res.status(404).json({
@@ -325,7 +325,7 @@ const eliminarUsuario = async (req,res) => {
         const { id } = req.params;
 
         //Buscar usuario
-        const usuario = await Usuario.findByPK(id);
+        const usuario = await Usuario.findByPk(id);
 
         if (!usuario) {
             return res.status(404).json({

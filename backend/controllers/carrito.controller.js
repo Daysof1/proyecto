@@ -98,7 +98,7 @@ const agregarAlCarrito = async (req, res) => {
         }
 
         //validacion 3: producto existente y esta activo
-        const producto = await Producto.findByPK(productoId);
+        const producto = await Producto.findByPk(productoId);
 
         if(!producto) {
         return res.status(400).json({
