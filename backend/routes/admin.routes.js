@@ -102,36 +102,38 @@ router.get('/usuarios/:id', usuarioController.getUsuarioById);
 router.get('/usuarios/:id/stats', usuarioController.getEstadisticasUsuarios);
 
 //POST /api/admin/usuarios
-router.post('/usuarios', usuarioController.crearUsuario);
+router.post('/usuarios', soloAdministrador, usuarioController.crearUsuario);
 
 //PUT /api/admin/usuarios
-router.put('/usuarios', usuarioController.actualizarUsuario);
+router.put('/usuarios', soloAdministrador, usuarioController.actualizarUsuario);
 
 //PATCH /api/admin/usuarios:id/toggle desactivar o activar usuario
-router.patch('/usuarios/:id/toggle', usuarioController.toggleUsuario);
+router.patch('/usuarios/:id/toggle', soloAdministrador, usuarioController.toggleUsuario);
 
 //DELETE /api/admin/usuarios
 router.get('/usuarios/:id', soloAdministrador, usuarioController.eliminarUsuario);
 
 
 //Rutas de pedidos
+//POST /api/admin/pedidos
+router.post('/pedidos', pedidoController.crearPedido);
+
 //GET /api/admin/pedidos
 router.get('/pedidos', pedidoController.getMisPedidos);
 
 //GET /api/admin/pedidos:id
 router.get('/pedidos/:id', pedidoController.getPedidosById);
 
-//GET /api/admin/pedidos/:id/stats
-router.get('/pedidos/:id/stats', pedidoController.getEstadisticasPedidos);
+//PUT /api/admin/pedidos
+router.put('/pedidos', pedidoController.cancelarPedido);
 
-//POST /api/admin/pedidos
-router.post('/pedidos', pedidoController.crearPedido);
+//GET /api/admin/pedidos
+router.get('/pedidos', pedidoController.getAllPedidos);
 
 //PUT /api/admin/pedidos
-router.put('/pedidos', soloAdministrador, pedidoController.actualizarEstadoPedido);
+router.put('/pedidos', pedidoController.actualizarEstadoPedido);
 
-//PATCH /api/admin/pedidos:id/toggle desactivar o activar pedido
-router.patch('/pedidos/:id/toggle', soloAdministrador, pedidoController.t);
+//GET /api/admin/pedidos/estadisticas
+router.get('/pedidos/estadisticas', pedidoController.getEstadisticasPedidos);
 
-//DELETE /api/admin/pedidos
-router.get('/pedidos/:id', soloAdministrador, pedidoController.eliminarpedido);
+module.exports = router;

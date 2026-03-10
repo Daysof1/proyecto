@@ -21,7 +21,7 @@ const { generarToken } = require('../config/jwt');
  * @param {Object} res response Express
  */
 
-const registrar = async (req, res) => {
+const register = async (req, res) => {
     try {
         const { rnombreol, apellido, email, password, telefono, direccion } = req.query
 
@@ -96,10 +96,10 @@ en el rol por defecto es cliente
             }
         });
     } catch (error) {
-        console.error('Error en registrar: ', error);
+        console.error('Error en register: ', error);
         res.status(400).json({
                 success: false,
-                message: 'Error al registrar usuario',
+                message: 'Error al register usuario',
                 errors: error.message
         });
     }
@@ -343,7 +343,7 @@ const changePassword = async (req, res) => {
 };
 //Exportar todos los controladores
 module.exports = {
-    registrar,
+    register,
     login,
     getMe,
     updateMe,
