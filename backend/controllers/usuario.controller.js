@@ -158,7 +158,7 @@ const crearUsuario = async (req, res) => {
         }
 
         // Crear usuario
-        const nuevaUsuario = await Usuario.create({
+        const nuevoUsuario = await Usuario.create({
             nombre,
             apellido,
             email,
@@ -174,7 +174,7 @@ const crearUsuario = async (req, res) => {
             success: true,
             message: 'Usuario creada exitosamente',
             data: {
-                usuario: nuevaUsuario.toJson() // solo convertir a json para excluir campos sensibles
+                usuario: nuevoUsuario.toJson() // solo convertir a json para excluir campos sensibles
             }
         });
     } catch (error) {
@@ -205,7 +205,7 @@ const crearUsuario = async (req, res) => {
 const actualizarUsuario = async (req, res) => {
     try {
         const { id } = req.params;
-        const { nombre, apellido, email, password, rol, telefono, direccion } = req.body;
+        const { nombre, apellido, rol, telefono, direccion } = req.body;
 
         //Buscar usuario
        const usuario = await Usuario.findByPk(id);
@@ -240,7 +240,7 @@ const actualizarUsuario = async (req, res) => {
             success: true,
             message: 'Usuario actualizada exitosamnete',
             data: {
-                usuario
+                usuario: usuario.toJSON()
             }
         });
 

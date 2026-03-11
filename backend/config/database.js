@@ -1,22 +1,22 @@
 /** CONFIGURACION DE LA BASE DE DATOS */
 
-//Importar Sequelize
-const { Sequelize } = require('sequelize');
+//Importar Sequelize: Permite trabajar directamente con la base de dats desde javaScript
+const { sequelize } = require('sequelize');
 
 //Importar dotenv para variables de entorno
 require('dotenv').config();
 
-//Crear instamcias de secualize
+//Crear instamcias de sequelize
 const sequelize = new Sequelize(
-    Process.env.DB_NAME,
-    Process.env.DB_USER,
-    Process.env.DB_PASSWORD,
+    process.env.DB_NAME,
+    process.env.DB_USER,
+    process.env.DB_PASSWORD,
     {
-        host: process.env.DB_HOST,
-        port: process.env.DB_PORT,
+        host: process.env.DB_HOST, //localhost
+        port: process.env.DB_PORT, //3306
         dialect: 'mysql',
 
-        //Configuracion de pool de conex
+        //Configuracion de pool de conexiones
         //Mantiene las conexiones abiertas para mejorar el rendimiento
         pool: {
             max: 5, //Número máximo de conexiones en el pool
@@ -29,15 +29,15 @@ const sequelize = new Sequelize(
         logging: process.env.NODE_ENV === 'development' ? console.log : false,
 
         //Zona horaria
-        timezone: '.05:00', //Zona horaria de Colombia
+        timezone: '-05:00', //Zona horaria de Colombia
 
         // Opciones adicionales
         define: {
             // timestamps : true crea automaticamente los campos createAt y updateAt
-            timestramps: true,
+            timestamps: true,
 
             //underscored: true usa snake_case para nombres de las columnas
-            undescored: false,
+            underscored: false,
 
             //frazeTableName: true usa el nombre del modelo cual para la tabla 
             freezeTableName: true
@@ -50,7 +50,7 @@ esta funcion se llamara al iniciar el servido
 */
 const testConnection = async () => {
     try {
-        //Intentar autennticar con la base de datos
+        //Intentar autenticar con la base de datos
         await sequelize.authenticate();
         console.log('Conexion a MySQL establecida correctamente');
         return true;

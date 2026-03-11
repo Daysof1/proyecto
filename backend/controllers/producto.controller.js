@@ -44,8 +44,18 @@ const getProductos = async (req, res) => {
         if (activo !== undefined) where.activo = activo === 'true';
         if (conStock === 'true') where.stock = { [require('sequelize').Op.gt]: 0};
 
+        if (buscar) {
+            const { Op } = require('sequelize');
+            // Op.or Opciones para buscar por nombre o descripcion
+            //Op.like equivale a un like en sql con condiciones para buscar cosidencias parciales
+            where[Op.or] = [
+                { nombre: { [Op.like]: `%${buscar}%` }},
+                { descripcion: { [Op.like]: `%${buscar}%` }}
+            ];
+        }
+
         //paginacion
-        const offset = (parseInt(pagina) -1) * parseInt(limite);
+        const offset = (parseInt(pagina) -1) * parseInt(limite); //Cuenta los registros
 
         // Opciones de consulta
         const opciones = {
@@ -107,7 +117,7 @@ const getProductosById = async (req, res) => {
         const { id } = req.params;
 
         //Buscar productos con relacion
-        const producto = await Producto.findAll( id, {
+        const producto = await Producto.findByPk( id, {
             include: [
                 {
                     model: Categoria,
@@ -194,7 +204,7 @@ const crearProducto = async (req, res) => {
 
 
         //valida 3 si la subcategoria existe y pertenece a una categoria
-        const subcategoria = await Subcategoria.findByPk(categoriaId);
+        const subcategoria = await Subcategoria.findByPk(subcategoriaId);
 
         if(!subcategoria) {
             return res.status(404).json({
@@ -215,7 +225,7 @@ const crearProducto = async (req, res) => {
                 message: `La subcategoria ${subcategoria.nombre} no pertenece a la categoria con id ${categoriaId}`
             });
         }
-        //Validacion 4 perrecio
+        //Validacion 4 precio
         if(parseFloat(precio) < 0) {
             return res.status(400).json({
                 success: false,
@@ -364,7 +374,7 @@ const actualizarProducto = async (req, res) => {
             if (req.file) {
                 //Eliminar imagen anterior si existe
                 if(producto.imagen) {
-                    const rutaImagenAnterior = path.join(__dirname, '../uploads', producto.imagen);
+                    const rutaImagenAnterior = path.join(__dirname, '../uploads', producto.imagen); //dirname comando que permite cambiar el nombre del archivo
                     try {
                         await fs.unlink(rutaImagenAnterior);
                     } catch (err) {
@@ -530,8 +540,8 @@ const actualizarStock =  async (req, res) => {
                 message: 'Se requiere cantidad y operacion'
             });
         }
-        const cantidadNUm = parseInt(cantidad);
-        if (cantidadNUm < 0) {
+        const cantidadNum = parseInt(cantidad);
+        if (cantidadNum < 0) {
             return res.status(400).json({
                 success: false,
                 message: 'La cantidad no puede ser negativa'
@@ -550,19 +560,19 @@ const actualizarStock =  async (req, res) => {
 
         switch (operacion) {
             case 'aumentar':
-                nuevoStock = producto.aumentarStock(cantidadNUm);
+                nuevoStock = producto.aumentarStock(cantidadNum);
                 break;
             case 'reducir':
-                if (cantidadNUm > producto.stock) {
+                if (cantidadNum > producto.stock) {
                     return res.status(400).json({
                         success: false,
                         message: `No hay suficiente stock. Stock actual: ${producto.stock}`
                     });
                 }
-                nuevoStock = producto.reducirStock(cantidadNUm);
+                nuevoStock = producto.reducirStock(cantidadNum);
                 break;
             case 'establecer':
-                nuevoStock = cantidadNUm;
+                nuevoStock = cantidadNum;
                 break;
             default: 
                 return res.status(400).json({
@@ -576,11 +586,11 @@ const actualizarStock =  async (req, res) => {
 
             res.json({
                 success: true, 
-                message: `Stock ${oprecion === 'aumentar' ? 'aumentado' : operacion === 'reducir' ? 'reducido' : 'establecido'} exitosamente`,
+                message: `Stock ${operacion === 'aumentar' ? 'aumentado' : operacion === 'reducir' ? 'reducido' : 'establecido'} exitosamente`,
                 data: {
                     productoId : producto.id,
                     nombre: producto.nombre,
-                    stockAnterior: operacion === 'establecer' ? null : (operacion === 'aumentar' ? producto.stock - cantidadNUm : producto.stock + cantidadNUm),
+                    stockAnterior: operacion === 'establecer' ? null : (operacion === 'aumentar' ? producto.stock - cantidadNum : producto.stock + cantidadNum),
                     stockNuevo: producto.stock
                 }
             });

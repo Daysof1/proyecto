@@ -8,7 +8,7 @@
  */
 
 const Usuario = require('../models/Usuario');
-const { generarToken } = require('../config/jwt');
+const { generateToken } = require('../config/jwt');
 
 
 /**
@@ -23,7 +23,7 @@ const { generarToken } = require('../config/jwt');
 
 const register = async (req, res) => {
     try {
-        const { rnombreol, apellido, email, password, telefono, direccion } = req.query
+        const { nombre, apellido, email, password, telefono, direccion } = req.query
 
         //validacion 1 verificar que todos los campos requeridos esten presentes
         if (!nombre || !apellido || !email || !password) {
@@ -114,7 +114,7 @@ en el rol por defecto es cliente
  */
 const login = async (req, res) => {
     try {
-        //Extraer credenciañes del body
+        //Extraer credenciales del body
         const { email, password } = req.body;
 
         //validacion 1: verificar qe se proporcionaron email y password
@@ -270,7 +270,7 @@ const updateMe = async (req, res) => {
         console.error('Error en updateMe: ', error);
             return res.status(400).json({
                 success: false,
-                message: 'Error al actualizar perdiñ',
+                message: 'Error al actualizar perfil',
                 error: error.message
         });
     }

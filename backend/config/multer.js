@@ -9,10 +9,10 @@
 const multer = require('multer');
 
 //Importar path para trabjaar con rutas de archivos
-const path = require('path');
+const path = require('path'); //Crea las rutas de los archivos
 
 // Importar fs para verificar /crear directorios 
-const fs = require('fs');
+const fs = require('fs'); //Crear la carpeta/archivos,etc. Permite escribir dentro de las carpetas
 
 //importar dotenv para variables de entorno 
 require('dotenv').config();
@@ -20,9 +20,9 @@ require('dotenv').config();
 // Obtener la ruta de donde se guardan los archivos
 const uploadPath = process.env.UPLOAD_PATH || './uploads';
 
-//Veridicar si la carpeta uploads existe, si no crearla
+//Veridicar si la carpeta uploads existe, si no crearla: SYNC=consulta
 if (!fs.existsSync(uploadPath)) {
-    fs.mkdirSync(uploadPath, { recursive: true });
+    fs.mkdirSync(uploadPath, { recursive: true }); //Crear archivos
     console.log(`Carpeta ${uploadPath} creada`);
 }
 

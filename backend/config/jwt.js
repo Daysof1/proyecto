@@ -20,7 +20,7 @@ require('dotenv').config();
 const generateToken = (payload) => {
     try {
         //jwt.sign() crea y firma un token
-        //Paramnetros:
+        //Parametros:
         //1. payload: datos a incluir en token
         //2. secret: clave secreta para firmar (desde .env)
         //3. options: opciones adicionales como tiempo de expiracion
@@ -78,7 +78,7 @@ const extractToken = (authHeader) => {
     // verifica que el header exista y empieza con "Bearer "
     if (authHeader && authHeader.startsWith('Bearer ')) {
         // Extraer solo el token (quitar "Bearer")
-        return authHeader.substring(7);
+        return authHeader.substring(7); //Cracateres adicionales (7)
     }
 
     return null; // No se encuentra un token valido

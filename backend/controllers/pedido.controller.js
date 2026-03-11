@@ -35,7 +35,7 @@ const crearPedido = async (req, res) => {
         }
 
         //Validacion 2 telefono requerida
-        if (!telefono || telefono.trim() === '') {
+        if (!telefono || telefono.trim() === '') { //trim quita espacios de adelante y atras
             await t.rollback();
             return res.status(400).json({
                 success: false,
@@ -46,7 +46,7 @@ const crearPedido = async (req, res) => {
         //Validacion 3 metodo de pago requerido
         const metodosValidos = ['efectivo', 'tarjeta', 'transferencia'];
         if (!metodosValidos.includes(metodoPago)) {
-            await t.rollback();
+            await t.rollback(); //revierte la transaccion
             return res.status(400).json({
                 success: false,
                 message: `Metodo de pago invalido, opciones: ${metodosValidos,join(', ')}`
@@ -55,8 +55,8 @@ const crearPedido = async (req, res) => {
 
         //obtener items del carrito
 
-        const carritoItems = await Carrito.findAll({
-            where: { usuarioId: req.usuario.id},
+        const itemsCarrito = await Carrito.findAll({
+            where: { usuarioId: req.usuario.usuarioId},
             include: [{
                 model: Producto,
                 as: 'producto',
@@ -110,7 +110,7 @@ const crearPedido = async (req, res) => {
 
         //crear pedido
         const pedido = await Pedido.create({
-            usuarioId: req.usuarioId,
+            usuarioId: req.usuario.id,
             tptal: totalPedido,
             etado: 'pendiente',
             direccionEnvio,
@@ -260,7 +260,7 @@ const getMisPedidos = async (req, res) => {
 const getPedidosById = async (req, res) => {
     try {
         const { id } = req.params;
-        //construir filtros (cliente solo ve sus pedidos asmin ve todos)
+        //construir filtros (cliente solo ve sus pedidos admin ve todos)
         const where = { id };
         if (req.usuario.rol !== 'administrador') {
             where.usuarioId = req.usuario.id;
