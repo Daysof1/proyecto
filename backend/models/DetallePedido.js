@@ -97,7 +97,7 @@ const DetallePedido = sequelize.define('DetallePedido', {
      * Se calcula automaticamente antes de guardar
      */
     subtotal: {
-        type: DataTypes.DECUMAL(10, 2),
+        type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
         validate: {
             isDecimal: {
@@ -144,7 +144,7 @@ const DetallePedido = sequelize.define('DetallePedido', {
          * BeforeUpdate: se ejecuta antes de actualizar detalle de pedido
          * recalcula el subtotal si cambio precio o cantidad
          */
-        BeforeUpdate: (detalle) => {
+        beforeUpdate: (detalle) => {
             if (detalle.changed('precioUnitario') || detalle.changed('cantidad')) {
                 detalle.subtotal = parseFloat(detalle.precioUnitario) * detalle.cantidad;
 

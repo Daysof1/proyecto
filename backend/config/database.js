@@ -1,12 +1,12 @@
 /** CONFIGURACION DE LA BASE DE DATOS */
 
-//Importar Sequelize: Permite trabajar directamente con la base de dats desde javaScript
-const { sequelize } = require('sequelize');
+//Importar Sequelize: clase principal del orm
+const { Sequelize } = require('sequelize');
 
 //Importar dotenv para variables de entorno
 require('dotenv').config();
 
-//Crear instamcias de sequelize
+//Crear instancia de Sequelize
 const sequelize = new Sequelize(
     process.env.DB_NAME,
     process.env.DB_USER,
@@ -87,7 +87,7 @@ const syncDatabase = async (force = false, alter = false) => {
     }
 };
 // Exportar la instancia de sequelize y las funciones
-Module.exports = {
+module.exports = {
     sequelize,
     testConnection,
     syncDatabase

@@ -18,8 +18,8 @@ const path = require('path');
 //Importar dotenv para manejar variables de entorno
 require('dotenv').config();
 
-//Importar conexion de la base de datos
-const dbConfig = require('./config/database'); 
+//Importar conexion de la base de datos y utilidades
+const { sequelize, testConnection, syncDatabase } = require('./config/database'); 
 
 //importar modelos y asociaciones
 const { initAssociations } = require('./models');
@@ -78,7 +78,7 @@ if (process.env.NODE_ENV === 'development') {
 
 //Ruta raiz verificar que el servidor esta corriendo 
 
-app.get('/,', (req, res) => {
+app.get('/', (req, res) => {
     res.json({
         success: true,
         message: 'Servidor E-commerce Backend corriendo correctamente',
@@ -88,7 +88,7 @@ app.get('/,', (req, res) => {
 });
 
 // Ruta de salud verifica que el servidor como esta
-app.get('api/health', (res, res) => {
+app.get('/api/health', (req, res) => {
     res.json({
         success: true, 
         status: 'healthy',
@@ -102,7 +102,7 @@ app.get('api/health', (res, res) => {
 //rutas de autenticacion
 // incluye registro login, perfil
 
-const authRoutes = require('./routes/authRoutes');
+const authRoutes = require('./routes/auth.routes');
 app.use('/api/auth', authRoutes);
 
 //Ruta del administrador
@@ -119,7 +119,7 @@ app.use('/api', clienteRoutes);
 //Manejo de rutas no encontradas (404)
 
 app.use((req, res) => {
-    res.status(404),json({
+    res.status(404).json({
         success: false,
         message: 'Ruta no encontrada',
         path: req.path,

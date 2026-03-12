@@ -6,8 +6,6 @@
 
 
 //importar funciones de JWT
-const jwt = { verifyToken, extractToken } = require('../config/jwt');
-
 const { extractToken, verifyToken } = require('../config/jwt');
 //importar modelo de usuario
 const Usuario = require('../models/Usuario');
@@ -17,7 +15,7 @@ const Usuario = require('../models/Usuario');
 const verificarAuth = async (req, res, next) => {
     try {
         //paso 1 obtener el token del header Authorization
-        const authHeader = req.header = req.headers.authorization;
+        const authHeader = req.headers.authorization;
 
         if (!authHeader) {
             return res.status(401).json({

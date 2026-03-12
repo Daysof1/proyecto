@@ -116,7 +116,7 @@ const Producto = sequelize.define('Producto', {
      * Esta es la relacion con la tabla categoria
      */
     categoriaId: {
-        type: DataTypes.INTERGER,
+        type: DataTypes.INTEGER,
         allowNull: false,
         references: {
             model: 'categorias', //nombre de la tabla relacionada
