@@ -9,7 +9,6 @@ const Carrito = require('../models/Carrito');
 const Producto = require('../models/Producto');
 const Categoria = require('../models/Categoria');
 const Subcategoria = require('../models/Subcategoria');
-const { error } = require('node:console');
 
 /**
  * obtener carrito del usuario autenticado
@@ -45,7 +44,7 @@ const getCarrito = async (req, res) => {
         });
 
         //Calcular el total del carrito
-        let totalCarrito = 0;
+        let total = 0;
         itemsCarrito.forEach(item => {
             total += parseFloat(item.precioUnitario) * item.cantidad;
         });
@@ -58,7 +57,7 @@ const getCarrito = async (req, res) => {
                 resumen: {
                     totaItems: itemsCarrito.length,
                     cantidadTotal: itemsCarrito.reduce((sum, item) => sum + item.cantidad, 0),
-                    totalCarrito: total.toFixed(2)
+                    total: total.toFixed(2)
                 }
             }
         });
@@ -86,6 +85,7 @@ const agregarAlCarrito = async (req, res) => {
                 success: false,
                 message: 'El productoId es requerido'
             });
+
         }
 
         //validacion 2 cantidda valida
@@ -279,7 +279,7 @@ const eliminarItemCarriro = async (req, res) => {
         const { id } = req. params;
 
         //Buscar item del carrito
-        const itemCarrito = await Carrito.findOne ({
+        const item = await Carrito.findOne ({
             where: {
                 id,
                 usuarioId: req.usuario.id

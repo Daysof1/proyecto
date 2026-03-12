@@ -174,7 +174,7 @@ const Producto = sequelize.define('Producto', {
      * Hooks Acciones automaticas 
      */
 
-    hooks: {
+    hooks: { //importa los modelos 
         /**
          * beforeCreate - se ejecuta antes de crear un producto
          * valida que la subcategoria y que la categoria este activa

@@ -290,7 +290,7 @@ const getPedidosById = async (req, res) => {
                             },
                             {
                                 model: Subcategoria,
-                                as: 'sbcategoria',
+                                as: 'subcategoria',
                                 attributes: ['id', 'nombre']
                             }
                         ]

@@ -8,7 +8,6 @@
 //importar funciones de JWT
 const jwt = { verifyToken, extractToken } = require('../config/jwt');
 
-const { error } = require('node:console');
 const { extractToken, verifyToken } = require('../config/jwt');
 //importar modelo de usuario
 const Usuario = require('../models/Usuario');
@@ -40,7 +39,7 @@ const verificarAuth = async (req, res, next) => {
         //paso 2 verificar que el token es valido
         let decoded; //funcion para decodificar le token
         try {
-            decoded = verificarToken(token);
+            decoded = verifyToken(token);
         } catch (error) {
             return res.status(401).json({
                 success: false,
@@ -64,7 +63,7 @@ const verificarAuth = async (req, res, next) => {
         if (!usuario.activo) {
             return res.status(401).json({
                 success: false,
-                message: 'Usuario inactivo ocontacte al administrador'
+                message: 'Usuario inactivo contacte al administrador'
             });
         }
 
@@ -118,7 +117,7 @@ const verificarAuthOpcional = async (req, res, next) => {
                 req.usuario = null;
             }
         } catch (error) {
-            //Token invalido o expiradi continuar sin usuario
+            //Token invalido o expirado continuar sin usuario
             req.usuario = null;
         }
 

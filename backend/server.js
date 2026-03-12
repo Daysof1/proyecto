@@ -19,14 +19,13 @@ const path = require('path');
 require('dotenv').config();
 
 //Importar conexion de la base de datos
-const dbConfig = require('./backend/config/database'); //No puso backend
+const dbConfig = require('./config/database'); 
 
 //importar modelos y asociaciones
-const { initAssociations } = require('./backend/models'); //No puso backend
+const { initAssociations } = require('./models');
 
 //Importaar seeders
 const { runSeeders } = require('./seeders/adminSeeder');
-const { timeStamp } = require('console');
 
 //Crear alicaciones express
 
@@ -43,7 +42,7 @@ const PORT = process.env.PORT || 5000;
 app.use(cors({
     origin: process.env.FRONTEND_URL || 'https://localhost:3000', //url del frontend
     credentials: true, //permite envio de cookies
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], //Metodos permitiddos
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], //Metodos permitiddos
     allowedHeaders: ['Content-Type', 'Authorization']// Headers permitidos
 }));
 
