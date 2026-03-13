@@ -21,7 +21,7 @@ const { verificarAuth } = require('../middleware/auth');
 
 //Rutas publicas
 
-router.post('/resgister', register);
+router.post('/register', register);
 
 router.post('/login', login);
 

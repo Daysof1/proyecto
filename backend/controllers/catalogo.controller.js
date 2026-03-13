@@ -82,7 +82,7 @@ const getProductos = async (req, res) => {
 
         // Consultar productos
 
-        const opciones = { count, rows: productos } = await Producto.finfAndCountAll({
+        const opciones = { count, rows: productos } = await Producto.findAndCountAll({
             where,
             include: [
                 {
@@ -119,11 +119,11 @@ const getProductos = async (req, res) => {
 
     } catch (error) {
         console.error('Error en getProductos: ', error);
-        res.status(500).json[{
+        res.status(500).json({
             success: false,
             message: 'Error al obtener productos',
             error: error.message
-        }]
+        })
     }
 };
 
@@ -179,11 +179,11 @@ const getProductosById = async (req, res) => {
 
     } catch (error) {
         console.error('Error en getProductoById: ', error);
-        res.status(500).json[{
+        res.status(500).json({
             success: false,
             message: 'Error al obtener producto',
             error: error.message
-        }]
+        })
     }
 };
 
@@ -201,7 +201,7 @@ const getCategorias = async (req, res) => {
         const { Op } = require('sequelize');
 
         //Buscar categorias activas
-        const categoria = await Categoria.findOne({
+        const categorias = await Categoria.findAll({
             where: {activo: true},
             attributes: ['id', 'nombre', 'descripcion'],
             order: [['nombre', 'ASC']],
@@ -209,7 +209,7 @@ const getCategorias = async (req, res) => {
 
         //Para cada categoria contar productos activos con stock
         const categoriasConConteo = await Promise.all(
-            categoria.map(async (categoria) => {
+            categorias.map(async (categoria) => {
                 const totalProductos = await Producto.count({
                     where: {
                         categoriaId: categoria.id,
@@ -235,11 +235,11 @@ const getCategorias = async (req, res) => {
 
     } catch (error) {
         console.error('Error en getCategoria: ', error);
-        res.status(500).json[{
+        res.status(500).json({
             success: false,
             message: 'Error al obtener categoria',
             error: error.message
-        }]
+        })
     }
 };
 
@@ -269,7 +269,7 @@ const getSubcategoriasPorCategoria = async (req, res) => {
         }
 
         //Buscar subcategorias activas
-        const subcategoria = await Subcategoria.findOne({
+        const subcategoria = await Subcategoria.findAll({
             where: 
             {
                 categoriaId: id,
@@ -311,11 +311,11 @@ const getSubcategoriasPorCategoria = async (req, res) => {
 
     } catch (error) {
         console.error('Error en getSubcategoria: ', error);
-        res.status(500).json[{
+        res.status(500).json({
             success: false,
             message: 'Error al obtener subcategoria',
             error: error.message
-        }]
+        })
     }
 };
 
@@ -366,11 +366,11 @@ const getProductosDestacados = async (req, res) => {
 
     } catch (error) {
         console.error('Error en getProductosDestacados: ', error);
-        res.status(500).json[{
+        res.status(500).json({
             success: false,
             message: 'Error al obtener productos destacados',
             error: error.message
-        }]
+        })
     }
 };
 

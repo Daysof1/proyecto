@@ -8,14 +8,14 @@ const esAdministrador = (req, res, next) => {
     try {
         //verificar que existe req.usuario (viene de la autenticacion)
         if (!req.usuario) {
-            return res.estatus(401).json({
+            return res.status(401).json({
                 success: false,
                 message: 'Usuario no autenticado por favor iniciar sesion'
             });
         }
 
         //verificar que el rol es administrador
-        if (!req.usuario.rol !== 'administrador') {
+        if (req.usuario.rol !== 'administrador') {
             return res.status(403).json({
                 success: false,
                 message: 'Acceso denegado se requiere permisos del administrador'
@@ -42,14 +42,14 @@ const esCliente = (req, res, next) => {
     try {
         //verificar que existe req.usuario (viene de la autenticacion)
         if (!req.usuario) {
-            return res.estatus(401).json({
+            return res.status(401).json({
                 success: false,
                 message: 'Usuario no autenticado por favor iniciar sesion'
             });
         }
 
         //verificar que el rol es cliente
-        if (!req.usuario.rol !== 'cliente') {
+        if (req.usuario.rol !== 'cliente') {
             return res.status(403).json({
                 success: false,
                 message: 'Acceso denegado se requiere permisos de cliente'
@@ -78,7 +78,7 @@ const tieneRol = (req, res, next) => {
         try {
             //verificar que exuite req.usuario (viene de la autenticacion)
             if (!req.usuario) {
-                return res.estatus(401).json({
+                return res.status(401).json({
                     success: false,
                     message: 'Usuario no autenticado por favor iniciar sesion'
                 });
@@ -115,7 +115,7 @@ const esPropioUsuarioOAdmin = (req, res, next) => {
     try {
         //verificar que exuite req.usuario (viene de la autenticacion)
         if (!req.usuario) {
-            return res.estatus(401).json({
+            return res.status(401).json({
                 success: false,
                 message: 'Usuario no autenticado por favor iniciar sesion'
             });
@@ -159,7 +159,7 @@ const esAdminOAuxiliar = (req, res, next) => {
     try {
 
         if (!req.usuario) {
-            return res.estatus(401).json({
+            return res.status(401).json({
                 success: false,
                 message: 'Usuario no autenticado por favor iniciar sesion'
             });
@@ -195,14 +195,14 @@ const soloAdministrador = (req, res, next) => {
     try {
         //verificar que exuite req.usuario (viene de la autenticacion)
         if (!req.usuario) {
-            return res.estatus(401).json({
+            return res.status(401).json({
                 success: false,
                 message: 'Usuario no autenticado por favor iniciar sesion'
             });
         }
 
         //verificar que el rol es administrador
-        if (!req.usuario.rol !== 'administrador') {
+        if (req.usuario.rol !== 'administrador') {
             return res.status(403).json({
                 success: false,
                 message: 'Acceso denegado solo administradores pueden realizar esta operacion'

@@ -49,14 +49,14 @@ const crearPedido = async (req, res) => {
             await t.rollback(); //revierte la transaccion
             return res.status(400).json({
                 success: false,
-                message: `Metodo de pago invalido, opciones: ${metodosValidos,join(', ')}`
+                message: `Metodo de pago invalido, opciones: ${metodosValidos.join(', ')}`
             });
         }
 
         //obtener items del carrito
 
         const itemsCarrito = await Carrito.findAll({
-            where: { usuarioId: req.usuario.usuarioId},
+            where: { usuarioId: req.usuario.id},
             include: [{
                 model: Producto,
                 as: 'producto',
@@ -111,8 +111,8 @@ const crearPedido = async (req, res) => {
         //crear pedido
         const pedido = await Pedido.create({
             usuarioId: req.usuario.id,
-            tptal: totalPedido,
-            etado: 'pendiente',
+            total: totalPedido,
+            estado: 'pendiente',
             direccionEnvio,
             telefono,
             metodoPago,
@@ -210,7 +210,7 @@ const getMisPedidos = async (req, res) => {
         const offset = (parseInt(pagina) - 1) * parseInt(limite);
 
         //Consultar pedido
-        const { count, rows: pedidos } = await Pedido-findAndCountAll({
+        const { count, rows: pedidos } = await Pedido.findAndCountAll({
             where,
             include: [
                 {
@@ -225,7 +225,7 @@ const getMisPedidos = async (req, res) => {
             ],
             limit: parseInt(limite),
             offset,
-            orser: [['createAt', 'DESC']]
+            order: [['createdAt', 'DESC']]
         });
 
         //respuesta exitosa
@@ -421,7 +421,7 @@ const getAllPedidos = async (req, res) => {
         const offset = (parseInt(pagina) - 1) * parseInt(limite);
 
         //consultar pedidos
-        const { count, rows: pedidos } = await Pedido. findAndCountAll({
+        const { count, rows: pedidos } = await Pedido.findAndCountAll({
             where,
             include: [
                 {
@@ -441,7 +441,7 @@ const getAllPedidos = async (req, res) => {
             ],
             limite: parseInt(limite),
             offset,
-            order: [['createAt', 'DESC']]
+            order: [['createdAt', 'DESC']]
         });
 
         res.json({
@@ -560,7 +560,7 @@ const getEstadisticasPedidos = async (req, res) => {
 
         const pedidosHoy = await Pedido.count({
             where: {
-                createAt: { [Op.gte]: hoy } //pedidos ultimos 7 dias
+                createdAt: { [Op.gte]: hoy } //pedidos ultimos 7 dias
             }
         });
 

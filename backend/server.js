@@ -25,7 +25,12 @@ const { sequelize, testConnection, syncDatabase } = require('./config/database')
 const { initAssociations } = require('./models');
 
 //Importaar seeders
-const { runSeeders } = require('./seeders/adminSeeder');
+let runSeeders = async () => {}
+try {
+    ({ runSeeders } = require('./seeders/adminSeeder'));
+} catch (error) {
+    console.warn('seeders de administrador no encontrado, se omite la carga inicial');
+}
 
 //Crear alicaciones express
 

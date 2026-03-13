@@ -38,7 +38,7 @@ const getCategorias = async (req, res) => {
 
         // Incluir subcategorias si se solicita
         if (IncluirSubcategorias === 'true') {
-            opciones.include == [{
+            opciones.include = [{
                 model: Subcategoria,
                 as: 'subcategorias', // campo del alias para la relacion 
                 attributes: [ 'id', 'nombre', 'descripcion', 'activo'] //Campos a incluir de la subcategoria
@@ -60,11 +60,11 @@ const getCategorias = async (req, res) => {
 
     } catch (error) {
         console.error('Error en getCategorias: ', error);
-        res.status(500).json[{
+        res.status(500).json({
             success: false,
             message: 'Error al obtener categorias',
             error: error.message
-        }]
+        })
     }
 };
 
@@ -81,7 +81,7 @@ const getCategoriasById = async (req, res) => {
         const { id } = req.params;
 
         // Buscar categorias con subcategorias y contar productos
-        const categoria = await Categoria.findAll( id, {
+        const categoria = await Categoria.findByPk(id, {
             include: [
                 {
                     model: Subcategoria,
@@ -119,11 +119,11 @@ const getCategoriasById = async (req, res) => {
 
     } catch (error) {
         console.error('Error en getCategoriasById: ', error);
-        res.status(500).json[{
+        res.status(500).json({
             success: false,
             message: 'Error al obtener categoria',
             error: error.message
-        }]
+        })
     }
 };
 
@@ -215,8 +215,7 @@ const actualizarCategoria = async (req, res) => {
 
         // validacion 1 si se cambia el nombre verificar que no exista 
         if (nombre && nombre !== categoria.nombre) {
-            const categoriaConMismoNombre = await Categoria.findOne({ where: { nombre}
-            });
+            const categoriaConMismoNombre = await Categoria.findOne({ where: { nombre } });
 
             if (categoriaConMismoNombre) {
                 return res.status(400).json({
@@ -229,7 +228,6 @@ const actualizarCategoria = async (req, res) => {
         //Actualizar campos
         if (nombre !== undefined) categoria.nombre = nombre;
         if (descripcion !== undefined) categoria.descripcion = descripcion;
-        if (activo !== undefined) categoria.activo = activo;
 
         //guardar cambios
         await categoria.save();

@@ -43,7 +43,7 @@ const getSubategorias = async (req, res) => {
 
         // Incluir categoria si se solicita
         if (incluirCategoria === 'true') {
-            opciones.include == [{
+            opciones.include = [{
                 model: Categoria,
                 as: 'categoria', // campo del alias para la relacion 
                 attributes: [ 'id', 'nombre', 'activo'] //Campos a incluir de la categoria
@@ -65,11 +65,11 @@ const getSubategorias = async (req, res) => {
 
     } catch (error) {
         console.error('Error en getSubategorias: ', error);
-        res.status(500).json[{
+        res.status(500).json({
             success: false,
             message: 'Error al obtener subcategorias',
             error: error.message
-        }]
+        })
     }
 };
 
@@ -86,7 +86,7 @@ const getSubcategoriasById = async (req, res) => {
         const { id } = req.params;
 
         //Buscar subcategorias y contar productos
-        const subcategoria = await Subcategoria. findAll( id, {
+        const subcategoria = await Subcategoria.findByPk(id, {
             include: [
                 {
                     model: Categoria,
@@ -124,11 +124,11 @@ const getSubcategoriasById = async (req, res) => {
 
     } catch (error) {
         console.error('Error en getSubcategoriaById: ', error);
-        res.status(500).json[{
+        res.status(500).json({
             success: false,
             message: 'Error al obtener subcategoria',
             error: error.message
-        }]
+        })
     }
 };
 

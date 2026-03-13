@@ -40,7 +40,7 @@ const getCarrito = async (req, res) => {
                     ]
                 }
             ],
-            order: (('createAt', 'DESC'))
+            order: [['createdAt', 'DESC']]
         });
 
         //Calcular el total del carrito
@@ -107,7 +107,7 @@ const agregarAlCarrito = async (req, res) => {
         });
     }
 
-    if (producto.activo) {
+    if (!producto.activo) {
         return res.status(400).json({
             success: false,
             message: 'El producto no esta disponible'

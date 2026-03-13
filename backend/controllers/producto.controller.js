@@ -96,11 +96,11 @@ const getProductos = async (req, res) => {
 
     } catch (error) {
         console.error('Error en getProductos: ', error);
-        res.status(500).json[{
+        res.status(500).json({
             success: false,
             message: 'Error al obtener productos',
             error: error.message
-        }]
+        })
     }
 };
 
@@ -150,11 +150,11 @@ const getProductosById = async (req, res) => {
 
     } catch (error) {
         console.error('Error en getProductoById: ', error);
-        res.status(500).json[{
+        res.status(500).json({
             success: false,
             message: 'Error al obtener producto',
             error: error.message
-        }]
+        })
     }
 };
 
@@ -382,13 +382,6 @@ const actualizarProducto = async (req, res) => {
                     }
                 }
                 producto.imagen = req.file.filename
-            }
-
-            if (!nuevaSubcategoria.activo) {
-                return res.status(400).json({
-                    success: false,
-                    message: `La Subcategoria ${nuevaSubcategoria.nombre} esta inactiva`
-                });
             }
 
         //Actualizar campos

@@ -23,7 +23,7 @@ const { generateToken } = require('../config/jwt');
 
 const register = async (req, res) => {
     try {
-        const { nombre, apellido, email, password, telefono, direccion } = req.query
+        const { nombre, apellido, email, password, telefono, direccion } = req.body
 
         //validacion 1 verificar que todos los campos requeridos esten presentes
         if (!nombre || !apellido || !email || !password) {
@@ -43,7 +43,7 @@ const register = async (req, res) => {
         }
 
         //validacion 3 verificar la longitus de la contraseña
-        if (!password.length < 6) {
+        if (password.length < 6) {
             return res.status(400).json({
                 success: false,
                 message: 'La contraseña debe tener al menos 6 caracteres'
@@ -52,7 +52,7 @@ const register = async (req, res) => {
 
         //validacion 4 verificar que el email no este registrado
         const usuarioExistente = await Usuario.findOne({ where: { email }});
-        if (!usuarioExistente) {
+        if (usuarioExistente) {
             return res.status(400).json({
                 success: false,
                 message: 'El email ya esta registrado'
@@ -78,14 +78,14 @@ en el rol por defecto es cliente
         });
 
         //generar Token JWT con datos del usuario
-        const token = generarToken({
+        const token = generateToken({
             id: nuevaUsuario.id,
             email: nuevaUsuario.email,
             rol: nuevaUsuario.rol
         });
 
         //Respuesta exitosa
-        const usuarioRespuesta = nuevaUsuario.toJson();
+        const usuarioRespuesta = nuevaUsuario.toJSON();
         delete usuarioRespuesta.password; //elimina el campo de contraseña
         res.status(201).json({
             success: true,
@@ -148,7 +148,7 @@ const login = async (req, res) => {
 
         //validacion 4: verificar la contraseña 
         //usamos el metodo compararPassword del modelo usuario
-        const passwordValida = await usuario.compararpassword(password);
+        const passwordValida = await usuario.compararPassword(password);
 
         if (!passwordValida) {
             return res.status(401).json({

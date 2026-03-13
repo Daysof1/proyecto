@@ -35,8 +35,8 @@ router.get('/categorias/:id/stats', categoriaController.getEstadisticasCategoria
 //POST /api/admin/categorias
 router.post('/categorias', categoriaController.crearCategoria);
 
-//PUT /api/admin/categorias
-router.put('/categorias', categoriaController.actualizarCategoria);
+//PUT /api/admin/categorias/:id
+router.put('/categorias/:id', categoriaController.actualizarCategoria);
 
 //PATCH /api/admin/categorias:id/toggle desactivar o activar categoria
 router.patch('/categorias/:id/toggle', categoriaController.toggleCategoria);
@@ -58,8 +58,8 @@ router.get('/subcategorias/:id/stats', subcategoriaController.getEstadisticasSub
 //POST /api/admin/subcategorias
 router.post('/subcategorias', subcategoriaController.crearSubcategoria);
 
-//PUT /api/admin/subcategorias
-router.put('/subcategorias', subcategoriaController.actualizarSubcategoria);
+//PUT /api/admin/subcategorias/:id
+router.put('/subcategorias/:id', subcategoriaController.actualizarSubcategoria);
 
 //PATCH /api/admin/subcategorias:id/toggle desactivar o activar subcategoria
 router.patch('/subcategorias/:id/toggle', subcategoriaController.toggleSubcategoria);
@@ -78,8 +78,8 @@ router.get('/productos/:id', productoController.getProductosById);
 //POST /api/admin/productos
 router.post('/productos', productoController.crearProducto);
 
-//PUT /api/admin/productos
-router.put('/productos', productoController.actualizarProducto);
+//PUT /api/admin/productos/:id
+router.put('/productos/:id', productoController.actualizarProducto);
 
 //PATCH /api/admin/productos:id/toggle desactivar o activar producto
 router.patch('/productos/:id/toggle', productoController.toggleProducto);
@@ -104,8 +104,8 @@ router.get('/usuarios/:id/stats', usuarioController.getEstadisticasUsuarios);
 //POST /api/admin/usuarios
 router.post('/usuarios', soloAdministrador, usuarioController.crearUsuario);
 
-//PUT /api/admin/usuarios
-router.put('/usuarios', soloAdministrador, usuarioController.actualizarUsuario);
+//PUT /api/admin/usuarios/:id
+router.put('/usuarios/:id', soloAdministrador, usuarioController.actualizarUsuario);
 
 //PATCH /api/admin/usuarios:id/toggle desactivar o activar usuario
 router.patch('/usuarios/:id/toggle', soloAdministrador, usuarioController.toggleUsuario);

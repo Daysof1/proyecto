@@ -12,7 +12,6 @@ const bcrypt = require('bcrypt');
 
 //importar instancia de sequelize
 const { sequelize } = require('../config/database');
-const { before } = require('node:test');
 
 /**
  * Definir el modelo de Usuario
@@ -77,7 +76,7 @@ const Usuario = sequelize.define('Usuario', {
         defaultValue: 'cliente', // por defecto es cliente
         validate: {
             isIn: {
-                arg: [['cliente', 'auxiliar', 'administrador']],
+                args: [['cliente', 'auxiliar', 'administrador']],
                 msg: 'El rol debe ser cliente auxiliar o administrador'
             }
         }

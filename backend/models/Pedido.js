@@ -91,7 +91,7 @@ const Pedido = sequelize.define('Pedido', {
         type: DataTypes.STRING(20),
         allowNull: false,
         validate: {
-            notEmpy: {
+            notEmpty: {
                 msg: 'El telefono es obligatorio'
             }
         }
@@ -140,7 +140,7 @@ const Pedido = sequelize.define('Pedido', {
 
         {
             //indice para buscar pedidos por fecha
-            fields: ['createAt']
+            fields: ['createdAt']
         },
     ],
 

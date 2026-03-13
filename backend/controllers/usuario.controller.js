@@ -50,7 +50,7 @@ const getUsuarios = async (req, res) => {
             attributes: { exclude: ['password'] },
             limit: parseInt(limite),
             offset,
-            order: [['createAt', 'DESC']]
+            order: [['createdAt', 'DESC']]
         });
 
         //Respuesta exitosa
@@ -68,7 +68,7 @@ const getUsuarios = async (req, res) => {
         });
     } catch (error) {
         console.error('Error al getUsuarios: ', error),
-        res.ststus(500).json({
+        res.status(500).json({
             success: false,
             message: 'Error al obtener usuarios',
             error: error.message
@@ -112,11 +112,11 @@ const getUsuarioById = async (req, res) => {
 
     } catch (error) {
         console.error('Error en getUsuarioById: ', error);
-        res.status(500).json[{
+        res.status(500).json({
             sucess: false,
             message: 'Error al obtener usuario',
             error: error.message
-        }]
+        })
     }
 };
 
@@ -368,11 +368,11 @@ const eliminarUsuario = async (req,res) => {
 const getEstadisticasUsuarios = async (req, res)  => {
     try {
         //datos de usuarios
-        const totalUsuarios = await Usuario.counst();
-        const totalClientes = await Usuario.counst({ where: { rol: 'cliente' }});
-        const totalAdmins = await Usuario.counst({ where: { rol: 'administrador' }});
-        const usuariosActivos = await Usuario.counst({ where: { activo: true }});
-        const usuariosInactivos = await Usuario.counst({ where: { activo: false }});
+        const totalUsuarios = await Usuario.count();
+        const totalClientes = await Usuario.count({ where: { rol: 'cliente' }});
+        const totalAdmins = await Usuario.count({ where: { rol: 'administrador' }});
+        const usuariosActivos = await Usuario.count({ where: { activo: true }});
+        const usuariosInactivos = await Usuario.count({ where: { activo: false }});
 
         //Respuesta exitosa
 

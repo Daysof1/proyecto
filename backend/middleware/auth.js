@@ -46,7 +46,7 @@ const verificarAuth = async (req, res, next) => {
         }
 
         //buscar el usuario en la base de datos
-        const usuario = await Usuario.findById(decoded.id, {
+        const usuario = await Usuario.findByPk(decoded.id, {
             attributes: { exclude: ['password'] }//no incluir la contraseña en la respuesta
         });
 
@@ -67,6 +67,7 @@ const verificarAuth = async (req, res, next) => {
 
         //paso 5 Agregar el usuario al objeto req para uso posterios
         //ahora en los controladores podemos acceder a req.usuario
+        req.usuario = usuario;
 
         // continuar con el siguiente
         next();
@@ -105,7 +106,7 @@ const verificarAuthOpcional = async (req, res, next) => {
 
         try {
             const decoded = verifyToken(token);
-            const usuario = await Usuario.findById(decoded.id, {
+            const usuario = await Usuario.findByPk(decoded.id, {
                 attributes: { exclude: ['password'] }
             });
 
